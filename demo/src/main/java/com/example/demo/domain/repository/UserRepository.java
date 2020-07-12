@@ -1,8 +1,9 @@
 package com.example.demo.domain.repository;
 
-import org.springframework.boot.autoconfigure.security.SecurityProperties.User;
+import com.example.demo.domain.model.UserModel;
+
 import org.springframework.data.mongodb.repository.MongoRepository;
 
-public interface UserRepository extends MongoRepository<User, String> {
+public interface UserRepository extends MongoRepository<UserModel, String> {
 
 }
