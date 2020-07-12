@@ -1,0 +1,80 @@
+version: "3.7"
+services:
+  # https://hub.docker.com/_/mongo
+  mongodb-primary:
+    image: mongo
+    container_name: mongodb-primary
+    hostname: mongodb-primary
+    command: >
+      mongod
+      --replSet replset
+      --auth --keyFile /etc/mongod-keyfile
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: password
+#    volumes:
+#      - ./volumes/mongodb/root:/root:ro # Initialize script
+#      - ./volumes/mongodb/etc/mongod-keyfile:/etc/mongod-keyfile:ro # Permission: 600
+    ports:
+      - 27017:27017
+    networks:
+      - replset
+    depends_on:
+      - mongodb-secondary
+      - mongodb-arbiter
+    restart: on-failure
+
+  # https://hub.docker.com/_/mongo
+  mongodb-secondary:
+    image: mongo
+    container_name: mongodb-secondary
+    hostname: mongodb-secondary
+    command: >
+      mongod
+      --port 27018
+      --replSet replset
+      --auth --keyFile /etc/mongod-keyfile
+#    volumes:
+#      - ./volumes/mongodb/etc/mongod-keyfile:/etc/mongod-keyfile:ro # Permission: 600
+    ports:
+      - 27018:27018
+    networks:
+      - replset
+    depends_on:
+      - mongodb-arbiter
+    restart: on-failure
+
+  # https://hub.docker.com/_/mongo
+  mongodb-arbiter:
+    image: mongo
+    container_name: mongodb-arbiter
+    hostname: mongodb-arbiter
+    command: >
+      mongod
+      --port 27019
+      --replSet replset
+      --auth --keyFile /etc/mongod-keyfile
+#    volumes:
+#      - ./volumes/mongodb/etc/mongod-keyfile:/etc/mongod-keyfile:ro # Permission: 600
+    ports:
+      - 27019:27019
+    networks:
+      - replset
+    restart: on-failure
+          
+  mongo-express:
+    image: mongo-express
+    container_name: mongo-express
+    restart: always
+    ports:
+      - 8081:8081
+    environment:
+      ME_CONFIG_MONGODB_SERVER: 192.168.3.3
+      ME_CONFIG_MONGODB_ADMINUSERNAME: root
+      ME_CONFIG_MONGODB_ADMINPASSWORD: password
+
+networks:
+  replset:
+    ipam:
+      config:
+      - subnet: 192.168.1.0/24 # Any
