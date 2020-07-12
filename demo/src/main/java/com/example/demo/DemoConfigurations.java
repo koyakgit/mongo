@@ -6,6 +6,8 @@ import com.mongodb.client.MongoClients;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.mongodb.MongoDatabaseFactory;
+import org.springframework.data.mongodb.MongoTransactionManager;
 
 @Configuration
 public class DemoConfigurations {
@@ -14,6 +16,11 @@ public class DemoConfigurations {
     @Autowired
     public DemoConfigurations(DemoProperties properties) {
         this.properties = properties;
+    }
+
+    @Bean
+    public MongoTransactionManager transactionManager(MongoDatabaseFactory mongoDatabaseFactory) {
+        return new MongoTransactionManager(mongoDatabaseFactory);
     }
 
     @Bean
